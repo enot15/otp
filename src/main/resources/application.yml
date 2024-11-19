@@ -1,0 +1,8 @@
+server:
+  port: ${OTP_PORT:8082}
+  servlet:
+    context-path: /${spring.application.name}
+
+spring:
+  application:
+    name: otp
