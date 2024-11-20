@@ -1,4 +1,4 @@
-package ru.prusakova.dto;
+package ru.prusakova.otp.dto;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;

@@ -1,4 +1,4 @@
-package ru.prusakova.dto.common;
+package ru.prusakova.otp.dto.common;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

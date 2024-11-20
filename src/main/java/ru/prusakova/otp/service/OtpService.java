@@ -1,9 +1,9 @@
-package ru.prusakova.service;
+package ru.prusakova.otp.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.prusakova.dto.CheckOtpRequest;
-import ru.prusakova.dto.GenerateOtpRequest;
+import ru.prusakova.otp.dto.CheckOtpRequest;
+import ru.prusakova.otp.dto.GenerateOtpRequest;
 
 @Service
 @RequiredArgsConstructor

@@ -1,4 +1,4 @@
-package ru.prusakova.exception;
+package ru.prusakova.otp.exception;
 
 public class OtpException extends RuntimeException {
 

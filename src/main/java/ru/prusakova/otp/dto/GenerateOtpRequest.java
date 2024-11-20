@@ -1,9 +1,6 @@
-package ru.prusakova.dto;
+package ru.prusakova.otp.dto;
 
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -26,21 +23,21 @@ public class GenerateOtpRequest {
     @NotNull(message = "Текст сообщения не может отсутствовать или быть null")
     private String message;
 
-    @Min(4)
-    @Max(8)
+    @Min(value = 4, message = "Длина одноразового пароля должна быть от 4")
+    @Max(value = 8, message = "Длина одноразового пароля должна быть до 8")
     @NotNull(message = "Длина одноразового пароля не может отсутствовать или быть null")
     private Integer length;
 
-    @Min(30)
+    @Min(value = 30, message = "Время жизни одноразового пароля должно быть не менее 30 секунд")
     @NotNull(message = "Время жизни одноразового пароля в секундах не может отсутствовать или быть null")
     private Integer ttl;
 
-    @Min(1)
-    @Max(3)
+    @Min(value = 1, message = "Количество возможных повторных отправок кода должно быть от 1")
+    @Max(value = 3, message = "Количество возможных повторных отправок кода должно быть до 3")
     @NotNull(message = "Количество возможных повторных отправок кода не может отсутствовать или быть null")
     private Integer resendAttempts;
 
-    @Min(30)
+    @Min(value = 30, message = "Таймаут перед повторным запросом пароля должен быть не менее 30 секунд")
     @NotNull(message = "Таймаут перед повторным запросом пароля в секундах не может отсутствовать или быть null")
     private Integer resendTimeout;
 }

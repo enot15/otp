@@ -1,4 +1,4 @@
-package ru.prusakova;
+package ru.prusakova.otp;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
