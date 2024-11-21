@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.validator.constraints.Range;
 
 import java.util.UUID;
 
@@ -23,8 +24,7 @@ public class GenerateOtpRequest {
     @NotNull(message = "Текст сообщения не может отсутствовать или быть null")
     private String message;
 
-    @Min(value = 4, message = "Длина одноразового пароля должна быть от 4")
-    @Max(value = 8, message = "Длина одноразового пароля должна быть до 8")
+    @Range(min = 4, max = 8, message = "Длина одноразового пароля должна быть от 4 до 8")
     @NotNull(message = "Длина одноразового пароля не может отсутствовать или быть null")
     private Integer length;
 
@@ -32,8 +32,7 @@ public class GenerateOtpRequest {
     @NotNull(message = "Время жизни одноразового пароля в секундах не может отсутствовать или быть null")
     private Integer ttl;
 
-    @Min(value = 1, message = "Количество возможных повторных отправок кода должно быть от 1")
-    @Max(value = 3, message = "Количество возможных повторных отправок кода должно быть до 3")
+    @Range(min = 1, max = 3, message = "Количество возможных повторных отправок кода должно быть от 1 до 3")
     @NotNull(message = "Количество возможных повторных отправок кода не может отсутствовать или быть null")
     private Integer resendAttempts;
 
