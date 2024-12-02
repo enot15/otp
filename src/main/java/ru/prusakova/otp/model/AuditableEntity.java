@@ -8,24 +8,31 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 
+import static ru.prusakova.otp.util.Constants.DEFAULT_DB_USER;
+
 @Getter
 @Setter
 @MappedSuperclass
 public class AuditableEntity {
 
     private LocalDateTime createTime;
-    private LocalDateTime updateTime;
-    
+    private String createUser;
+    private LocalDateTime lastUpdateTime;
+    private String lastUpdateUser;
+
     @PrePersist
     public void prePersist() {
         LocalDateTime now = LocalDateTime.now();
         this.createTime = now;
-        this.updateTime = now;
+        this.lastUpdateTime = now;
+        this.createUser = DEFAULT_DB_USER;
+        this.lastUpdateUser =  DEFAULT_DB_USER;
 
     }
 
     @PreUpdate
     public void preUpdate() {
-        this.updateTime = LocalDateTime.now();
+        this.lastUpdateTime = LocalDateTime.now();
+        this.lastUpdateUser =  DEFAULT_DB_USER;
     }
 }

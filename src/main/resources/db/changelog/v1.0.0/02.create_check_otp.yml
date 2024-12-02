@@ -19,10 +19,10 @@ databaseChangeLog:
               - column:
                   name: otp
                   type: varchar
-                  remarks: "Введенный клиентом пароль"
+                  remarks: "Введенный клиентом код"
               - column:
                   name: check_time
-                  type: timestamptz
+                  type: timestamp
                   remarks: "Время проверки"
               - column:
                   name: correct
@@ -30,9 +30,17 @@ databaseChangeLog:
                   remarks: "Признак корректности введенного пароля"
               - column:
                   name: create_time
-                  type: timestamptz
+                  type: timestamp
                   remarks: "Время создания"
               - column:
-                  name: update_time
-                  type: timestamptz
+                  name: create_user
+                  type: varchar
+                  remarks: "Пользователь, который создал запись"
+              - column:
+                  name: last_update_time
+                  type: timestamp
                   remarks: "Время обновления"
+              - column:
+                  name: last_update_user
+                  type: varchar
+                  remarks: "Пользователь, который изменил запись"

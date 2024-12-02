@@ -35,7 +35,7 @@ databaseChangeLog:
               - column:
                   name: resend_attempts
                   type: int
-                  remarks: "Количество возможных повторных запросов кода в секундах"
+                  remarks: "Количество возможных повторных отправок кода"
               - column:
                   name: resend_timeout
                   type: int
@@ -54,13 +54,21 @@ databaseChangeLog:
                   remarks: "Статус отправки сообщения"
               - column:
                   name: send_time
-                  type: timestamptz
+                  type: timestamp
                   remarks: "Время отправки одноразового пароля"
               - column:
                   name: create_time
-                  type: timestamptz
+                  type: timestamp
                   remarks: "Время создания"
               - column:
-                  name: update_time
-                  type: timestamptz
+                  name: create_user
+                  type: varchar
+                  remarks: "Пользователь, который создал запись"
+              - column:
+                  name: last_update_time
+                  type: timestamp
                   remarks: "Время обновления"
+              - column:
+                  name: last_update_user
+                  type: varchar
+                  remarks: "Пользователь, который изменил запись"
