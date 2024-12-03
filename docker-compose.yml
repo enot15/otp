@@ -1,0 +1,27 @@
+version: '3.3'
+
+volumes:
+  postgres_volume:
+
+services:
+  postgres-otp:
+    image: postgres:latest
+    container_name: postgres-ls
+    ports:
+      - 5434:5432
+    environment:
+      POSTGRES_DB: mentoring
+      POSTGRES_USER: dev
+      POSTGRES_PASSWORD: Ab123456
+    volumes:
+      - postgres_volume:/var/lib/postgresql/data
+
+  otp:
+    depends_on:
+      - postgres-otp
+    build: .
+    container_name: otp
+    ports:
+      - "8082:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker-compose

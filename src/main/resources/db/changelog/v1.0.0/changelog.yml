@@ -1,0 +1,13 @@
+databaseChangeLog:
+  - changeSet:
+      id: release/1.0.0
+      author: "Prusakova AA"
+      changes:
+        - tagDatabase:
+            tag: release/1.0.0
+  - include:
+      file: 01.create_send_otp.yml
+      relativeToChangelogFile: true
+  - include:
+      file: 02.create_check_otp.yml
+      relativeToChangelogFile: true
