@@ -1,5 +1,6 @@
 package ru.prusakova.otp.listener;
 
+import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -21,10 +22,10 @@ public class SendOtpConsumer {
     @KafkaListener(topics = "${otp.kafka.send-otp.topic-out}")
     public void consume(ConsumerRecord<String, String> consumerRecord) {
         log.info("Ответ из кафка получен: {}", consumerRecord.toString());
-        KafkaSendOtpOutResponse response = jsonUtil.fromJson(consumerRecord.value(), KafkaSendOtpOutResponse.class);
-
-        if(response == null) {
-            log.error("Ошибка преобразования JSON: {}", consumerRecord.value());
+        try {
+            KafkaSendOtpOutResponse response = jsonUtil.fromJson(consumerRecord.value(), KafkaSendOtpOutResponse.class);
+        } catch (Exception e) {
+            log.error("Ошибка преобразования JSON: {}", consumerRecord.value(), e);
         }
     }
 }
