@@ -13,15 +13,18 @@ import ru.prusakova.otp.util.JsonUtil;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@ConditionalOnProperty(prefix = "otp.kafka.send-otp-out", name = "enabled", havingValue = "true")
+@ConditionalOnProperty(prefix = "otp.kafka.send-otp", name = "enabled", havingValue = "true")
 public class SendOtpConsumer {
 
     private final JsonUtil jsonUtil;
 
-    @KafkaListener(topics = "${otp.kafka.send-otp-out.topic}")
-    public void consume(ConsumerRecord<String, String> consumerRecord,
-                        @Payload(required = false) String payload) {
+    @KafkaListener(topics = "${otp.kafka.send-otp.topic-out}")
+    public void consume(ConsumerRecord<String, String> consumerRecord) {
         log.info("Ответ из кафка получен: {}", consumerRecord.toString());
-        KafkaSendOtpOutResponse response = jsonUtil.fromJson(payload, KafkaSendOtpOutResponse.class);
+        KafkaSendOtpOutResponse response = jsonUtil.fromJson(consumerRecord.value(), KafkaSendOtpOutResponse.class);
+
+        if(response == null) {
+            log.error("Ошибка преобразования JSON: {}", consumerRecord.value());
+        }
     }
 }

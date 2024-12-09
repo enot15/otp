@@ -19,17 +19,15 @@ spring:
     hibernate:
       ddl-auto: validate
   kafka:
-    bootstrap-servers: localhost:29092
+    bootstrap-servers: 195.93.252.91:29092
     producer:
       acks: all
     consumer:
-      group-id: otp-group
+      group-id: prusakova-otp-group
 
 otp:
   kafka:
-    send-otp-in:
+    send-otp:
       enabled: true
-      topic: Send.Otp.IN.V1
-    send-otp-out:
-      enabled: true
-      topic: Send.Otp.OUT.V1
+      topic-in: Send.Otp.IN.V1
+      topic-out: Send.Otp.OUT.V1

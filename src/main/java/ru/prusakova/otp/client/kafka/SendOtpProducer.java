@@ -12,18 +12,16 @@ import ru.prusakova.otp.util.JsonUtil;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@ConditionalOnProperty(prefix = "otp.kafka.send-otp-in", name = "enabled", havingValue = "true")
+@ConditionalOnProperty(prefix = "otp.kafka.send-otp", name = "enabled", havingValue = "true")
 public class SendOtpProducer {
 
     private final JsonUtil jsonUtil;
     private final KafkaTemplate<String, String> kafkaTemplate;
 
-    @Value("${otp.kafka.send-otp-in.topic}")
+    @Value("${otp.kafka.send-otp.topic-in}")
     private String topicIn;
 
     public void sendMessage(String sendMessageKey, String telegramChatId, String message) {
-        log.info("Формирование запроса в кафку");
-
         KafkaSendOtpInRequest request = KafkaSendOtpInRequest.builder()
                 .id(sendMessageKey)
                 .telegramChatId(telegramChatId)

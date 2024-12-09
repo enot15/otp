@@ -15,7 +15,7 @@ import lombok.experimental.SuperBuilder;
 public class KafkaSendOtpOutResponse {
 
     private String id;
-    private String status;
+    private StatusEnum status;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String errorMessage;
