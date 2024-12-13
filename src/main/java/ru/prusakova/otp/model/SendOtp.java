@@ -6,7 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import ru.prusakova.otp.dto.StatusDeliveryEnum;
+import ru.prusakova.otp.dto.SendOtpStatus;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -33,7 +33,7 @@ public class SendOtp extends AuditableEntity {
     private String salt;
     private String sendMessageKey;
     @Enumerated(value = EnumType.STRING)
-    private StatusDeliveryEnum status;
+    private SendOtpStatus status;
     private LocalDateTime sendTime;
 
     @Override

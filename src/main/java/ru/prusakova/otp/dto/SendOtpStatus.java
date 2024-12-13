@@ -1,6 +1,6 @@
 package ru.prusakova.otp.dto;
 
-public enum StatusDeliveryEnum {
+public enum SendOtpStatus {
     IN_PROGRESS,
     DELIVERED,
     ERROR

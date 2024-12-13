@@ -1,8 +1,9 @@
 package ru.prusakova.otp.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.prusakova.otp.dto.CheckOtpRequest;
 import ru.prusakova.otp.exception.OtpException;
@@ -15,9 +16,13 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class CheckOtpService {
+
+    @Autowired
+    private BCryptPasswordEncoder bCryptPasswordEncoder;
 
     private final CheckOtpRepository checkOtpRepository;
     private final SendOtpRepository sendOtpRepository;
@@ -37,9 +42,9 @@ public class CheckOtpService {
             }
 
             // проверить корректность введенного пароля
-            PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-            boolean matches = passwordEncoder.matches(request.getProcessId() + request.getOtp(), otp.get().getSalt());
+            boolean matches = bCryptPasswordEncoder.matches(request.getProcessId() + request.getOtp(), otp.get().getSalt());
             if (matches) {
+                log.info("Введен корректный пароль. processId={}", request.getProcessId());
                 saveCheckOtpInDb(request, true);
             } else {
                 saveCheckOtpInDb(request, false);
@@ -55,7 +60,7 @@ public class CheckOtpService {
                 .processId(request.getProcessId().toString())
                 .otp(request.getOtp())
                 .checkTime(LocalDateTime.now())
-                .correct(false)
+                .correct(correct)
                 .build();
         checkOtpRepository.save(checkOtp);
     }
