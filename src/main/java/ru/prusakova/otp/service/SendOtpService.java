@@ -3,10 +3,11 @@ package ru.prusakova.otp.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.prusakova.otp.dto.GenerateOtpRequest;
+import ru.prusakova.otp.dto.IntegrationStatus;
+import ru.prusakova.otp.dto.KafkaSendOtpOutResponse;
 import ru.prusakova.otp.dto.SendOtpStatus;
 import ru.prusakova.otp.exception.OtpException;
 import ru.prusakova.otp.model.SendOtp;
@@ -41,9 +42,17 @@ public class SendOtpService {
 
         //сохранить в бд
         String sendMessageKey = UUID.randomUUID().toString();
-        saveSendOtpInDb(request, salt, messageFormat, sendMessageKey);
+        SendOtp sendOtp = saveSendOtpInDb(request, salt, messageFormat, sendMessageKey);
 
-        telegramSender.sendTelegram(sendMessageKey, request, messageFormat);
+        KafkaSendOtpOutResponse kafkaOutResponse = telegramSender.getKafkaOutResponse(sendOtp, sendMessageKey, request, messageFormat);
+        if (kafkaOutResponse.getStatus() == IntegrationStatus.ERROR) {
+            updateSendOtpInDb(sendOtp, SendOtpStatus.ERROR);
+            throw new OtpException(kafkaOutResponse.getErrorMessage());
+        }
+        if (kafkaOutResponse.getStatus() == IntegrationStatus.SUCCESS) {
+            log.info("Получен успешный ответ из кафки. id={}", kafkaOutResponse.getId());
+            updateSendOtpInDb(sendOtp, SendOtpStatus.DELIVERED);
+        }
     }
 
     private void checkTimeOtp(GenerateOtpRequest request) {
@@ -62,18 +71,17 @@ public class SendOtpService {
         List<SendOtp> otpList = sendOtpRepository.findByProcessId(request.getProcessId().toString());
         if (!otpList.isEmpty()) {
             // кол-во записей > resend_attempts с самым ранним create_time
-            int sizeOtpList = otpList.size();
             otpList.stream()
                     .min(Comparator.comparing(SendOtp::getCreateTime))
                     .ifPresent(otp -> {
-                        if (sizeOtpList > otp.getResendAttempts()) {
+                        if (otpList.size() > otp.getResendAttempts()) {
                             throw new OtpException("Превышено количество отправок ОТП");
                         }
                     });
         }
     }
 
-    private void saveSendOtpInDb(GenerateOtpRequest request, String salt, String messageFormat, String sendMessageKey) {
+    private SendOtp saveSendOtpInDb(GenerateOtpRequest request, String salt, String messageFormat, String sendMessageKey) {
         SendOtp sendOtp = SendOtp.builder()
                 .processId(request.getProcessId().toString())
                 .telegramChatId(request.getTelegramChatId())
@@ -87,6 +95,11 @@ public class SendOtpService {
                 .status(SendOtpStatus.IN_PROGRESS)
                 .sendTime(LocalDateTime.now())
                 .build();
+        return sendOtpRepository.save(sendOtp);
+    }
+
+    private void updateSendOtpInDb(SendOtp sendOtp, SendOtpStatus status) {
+        sendOtp.setStatus(status);
         sendOtpRepository.save(sendOtp);
     }
 }

@@ -27,38 +27,20 @@ public class TelegramSender {
     private final SendOtpProducer sendOtpProducer;
     private final KafkaMessageContext kafkaMessageContext;
 
-    public void sendTelegram(String sendMessageKey, GenerateOtpRequest request, String messageFormat) {
+    public KafkaSendOtpOutResponse getKafkaOutResponse(SendOtp sendOtp, String sendMessageKey, GenerateOtpRequest request, String messageFormat) {
         // отправить запрос в топик IN
         sendOtpProducer.sendMessage(sendMessageKey, request.getTelegramChatId(), messageFormat);
 
-        KafkaSendOtpOutResponse kafkaOutResponse = getKafkaOutResponse(sendMessageKey);
-        if (kafkaOutResponse.getStatus() == IntegrationStatus.ERROR) {
-            updateSendOtpInDb(sendMessageKey, SendOtpStatus.ERROR);
-            throw new OtpException(kafkaOutResponse.getErrorMessage());
-        }
-        if (kafkaOutResponse.getStatus() == IntegrationStatus.SUCCESS) {
-            log.info("Получен успешный ответ из кафки. id={}", kafkaOutResponse.getId());
-            updateSendOtpInDb(sendMessageKey, SendOtpStatus.DELIVERED);
-        }
-    }
-
-    private KafkaSendOtpOutResponse getKafkaOutResponse(String sendMessageKey) {
         CompletableFuture<KafkaSendOtpOutResponse> responseCompletableFuture = kafkaMessageContext.createMessageCompletableFuture(sendMessageKey);
         try {
             return responseCompletableFuture
                     .get(5000, TimeUnit.MILLISECONDS);
         } catch (TimeoutException | ExecutionException | InterruptedException e) {
-            updateSendOtpInDb(sendMessageKey, SendOtpStatus.ERROR);
+            sendOtp.setStatus(SendOtpStatus.ERROR);
+            sendOtpRepository.save(sendOtp);
             throw new OtpException("Таймаут ожидания ответа от сервиса отправки сообщения", e);
         } finally {
             kafkaMessageContext.removeById(sendMessageKey);
         }
-    }
-
-    private void updateSendOtpInDb(String sendMessageKey, SendOtpStatus status) {
-        SendOtp otpBySendMessageKey = sendOtpRepository.findBySendMessageKey(sendMessageKey)
-                .orElseThrow(() -> new OtpException("Не найдена сущность по sendMessageKey " + sendMessageKey));
-        otpBySendMessageKey.setStatus(status);
-        sendOtpRepository.save(otpBySendMessageKey);
     }
 }
