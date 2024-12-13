@@ -7,7 +7,7 @@ import ru.prusakova.otp.client.kafka.SendOtpProducer;
 import ru.prusakova.otp.dto.GenerateOtpRequest;
 import ru.prusakova.otp.dto.KafkaSendOtpOutResponse;
 import ru.prusakova.otp.dto.SendOtpStatus;
-import ru.prusakova.otp.dto.Status;
+import ru.prusakova.otp.dto.IntegrationStatus;
 import ru.prusakova.otp.exception.OtpException;
 import ru.prusakova.otp.listener.KafkaMessageContext;
 import ru.prusakova.otp.model.SendOtp;
@@ -32,11 +32,11 @@ public class TelegramSender {
         sendOtpProducer.sendMessage(sendMessageKey, request.getTelegramChatId(), messageFormat);
 
         KafkaSendOtpOutResponse kafkaOutResponse = getKafkaOutResponse(sendMessageKey);
-        if (kafkaOutResponse.getStatus() == Status.ERROR) {
+        if (kafkaOutResponse.getStatus() == IntegrationStatus.ERROR) {
             updateSendOtpInDb(sendMessageKey, SendOtpStatus.ERROR);
             throw new OtpException(kafkaOutResponse.getErrorMessage());
         }
-        if (kafkaOutResponse.getStatus() == Status.SUCCESS) {
+        if (kafkaOutResponse.getStatus() == IntegrationStatus.SUCCESS) {
             log.info("Получен успешный ответ из кафки. id={}", kafkaOutResponse.getId());
             updateSendOtpInDb(sendMessageKey, SendOtpStatus.DELIVERED);
         }

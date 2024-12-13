@@ -1,6 +1,6 @@
 package ru.prusakova.otp.dto;
 
-public enum Status {
+public enum IntegrationStatus {
     SUCCESS,
     ERROR
 }

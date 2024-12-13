@@ -23,9 +23,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class SendOtpService {
 
-    @Autowired
-    private BCryptPasswordEncoder bCryptPasswordEncoder;
-
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final SendOtpRepository sendOtpRepository;
     private final TelegramSender telegramSender;
 

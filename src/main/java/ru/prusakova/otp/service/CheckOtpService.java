@@ -21,9 +21,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class CheckOtpService {
 
-    @Autowired
-    private BCryptPasswordEncoder bCryptPasswordEncoder;
-
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final CheckOtpRepository checkOtpRepository;
     private final SendOtpRepository sendOtpRepository;
 
