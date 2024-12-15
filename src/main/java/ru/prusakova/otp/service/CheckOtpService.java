@@ -26,30 +26,28 @@ public class CheckOtpService {
     private final SendOtpRepository sendOtpRepository;
 
     public void checkOtp(CheckOtpRequest request) {
-        Optional<SendOtp> otp = sendOtpRepository.findFirstByProcessIdOrderByCreateTimeDesc(request.getProcessId().toString());
-        if (otp.isPresent()) {
-            // create_time + ttl > текущее время
-            if (otp.get().getCreateTime().plusSeconds(otp.get().getTtl()).isBefore(LocalDateTime.now())) {
-                throw new OtpException("Время жизни ОТП истекло");
-            }
+        SendOtp otp = sendOtpRepository.findFirstByProcessIdOrderByCreateTimeDesc(request.getProcessId().toString())
+                .orElseThrow(() -> new OtpException("Не удалось найти информацию об отправке данного ОТП"));
 
-            List<CheckOtp> checkOtpList = checkOtpRepository.findByProcessIdAndOtpAndCorrectIsTrue(request.getProcessId().toString(), request.getOtp());
-            if (!checkOtpList.isEmpty()) {
-                saveCheckOtpInDb(request, false);
-                throw new OtpException("Попытка подтверждения ранее подтвержденного пароля");
-            }
+        // create_time + ttl > текущее время
+        if (otp.getCreateTime().plusSeconds(otp.getTtl()).isBefore(LocalDateTime.now())) {
+            throw new OtpException("Время жизни ОТП истекло");
+        }
 
-            // проверить корректность введенного пароля
-            boolean matches = bCryptPasswordEncoder.matches(request.getProcessId() + request.getOtp(), otp.get().getSalt());
-            if (matches) {
-                log.info("Введен корректный пароль. processId={}", request.getProcessId());
-                saveCheckOtpInDb(request, true);
-            } else {
-                saveCheckOtpInDb(request, false);
-                throw new OtpException("Введен неверный ОТП");
-            }
+        List<CheckOtp> checkOtpList = checkOtpRepository.findByProcessIdAndOtpAndCorrectIsTrue(request.getProcessId().toString(), request.getOtp());
+        if (!checkOtpList.isEmpty()) {
+            saveCheckOtpInDb(request, false);
+            throw new OtpException("Попытка подтверждения ранее подтвержденного пароля");
+        }
+
+        // проверить корректность введенного пароля
+        boolean matches = bCryptPasswordEncoder.matches(request.getProcessId() + request.getOtp(), otp.getSalt());
+        if (matches) {
+            log.info("Введен корректный пароль. processId={}", request.getProcessId());
+            saveCheckOtpInDb(request, true);
         } else {
-            throw new OtpException("Не удалось найти информацию об отправке данного ОТП");
+            saveCheckOtpInDb(request, false);
+            throw new OtpException("Введен неверный ОТП");
         }
     }
 
