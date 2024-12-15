@@ -1,14 +1,12 @@
 package ru.prusakova.otp.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import ru.prusakova.otp.dto.SendOtpStatus;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -34,7 +32,8 @@ public class SendOtp extends AuditableEntity {
     private Integer resendTimeout;
     private String salt;
     private String sendMessageKey;
-    private String status;
+    @Enumerated(value = EnumType.STRING)
+    private SendOtpStatus status;
     private LocalDateTime sendTime;
 
     @Override

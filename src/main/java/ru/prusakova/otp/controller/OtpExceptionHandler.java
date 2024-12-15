@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import ru.prusakova.otp.dto.common.CommonResponse;
 import ru.prusakova.otp.dto.common.ValidationError;
+import ru.prusakova.otp.exception.OtpException;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -58,6 +59,17 @@ public class OtpExceptionHandler {
         }
 
         return handleException(e);
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(OtpException.class)
+    public CommonResponse<?> handleOtpException(OtpException e) {
+        String errorMessage = e.getMessage();
+        log.error(errorMessage, e);
+
+        return CommonResponse.builder()
+                .errorMessage(errorMessage)
+                .build();
     }
 
     @ExceptionHandler(Exception.class)
